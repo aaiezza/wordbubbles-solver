@@ -13,7 +13,8 @@ import java.util.List;
  */
 public class Configuration
 {
-    private final static int DEFAULT_COLS = 3, DEFAULT_ROWS = 3;
+    private final static int   DEFAULT_COLS = 3,
+                                       DEFAULT_ROWS = 3;
 
     private final Letter [] [] letters;
 
@@ -75,7 +76,9 @@ public class Configuration
 
     public Configuration add( final char letter, final int row, final int col )
     {
-        return add( letter == Letter.BLANK_CHAR ? Letter.BLANK : new Letter( letter ), row, col );
+        return add(
+            ( letter == Letter.BLANK_CHAR || letter == ' ' ) ? Letter.BLANK : new Letter( letter ),
+            row, col );
     }
 
     public int numberOfLetters()

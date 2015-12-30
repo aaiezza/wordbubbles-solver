@@ -21,25 +21,26 @@ import com.shaba.wordbubble.utils.Dictionary;
  */
 public class WordBubbleSolver
 {
-    private static final String ILLEGAL_WORD_SIZES_FORMAT = "Cannot have word sizes %s, which add to %d, when there are only %d letters in the given configuration.";
+    private static final String    ILLEGAL_WORD_SIZES_FORMAT = "Cannot have word sizes %s, which add to %d, when there are only %d letters in the given configuration.";
+
+    private static final String [] DEFAULT_DICTIONARIES      = { "resources/dictionary.txt"/*
+                                                                                            * ,
+                                                                                            * "resources/google-dictionary.txt"
+                                                                                            */ };
 
     public static final Dictionary GET_DEFAULT_DICTIONARY()
     {
         final Dictionary dictionary = new Dictionary();
-        try ( final Scanner sc = new Scanner( new File( "resources/dictionary.txt" ) ) )
-        {
-            sc.forEachRemaining( word -> dictionary.insert( word.toUpperCase() ) );
-        } catch ( final FileNotFoundException e )
-        {
-            e.printStackTrace();
-        }
 
-        try ( final Scanner sc = new Scanner( new File( "resources/google-dictionary.txt" ) ) )
+        for ( final String dic : DEFAULT_DICTIONARIES )
         {
-            sc.forEachRemaining( word -> dictionary.insert( word.toUpperCase() ) );
-        } catch ( final FileNotFoundException e )
-        {
-            e.printStackTrace();
+            try ( final Scanner sc = new Scanner( new File( dic ) ) )
+            {
+                sc.forEachRemaining( word -> dictionary.insert( word.toUpperCase() ) );
+            } catch ( final FileNotFoundException e )
+            {
+                e.printStackTrace();
+            }
         }
 
         return dictionary;
@@ -47,7 +48,7 @@ public class WordBubbleSolver
 
     /* * * */
 
-    private final Dictionary dictionary;
+    private final Dictionary    dictionary;
 
     private final Configuration configuration;
 
@@ -153,12 +154,13 @@ public class WordBubbleSolver
 
             shellMode: while ( true )
             {
-                // ask for number of rows and columns or to quit
                 int rows = 0, cols = 0;
+
+                // ask for number of rows and columns or to quit
                 while ( true )
                 {
                     System.out.print( "\n Give rows and columns (#R #C) or (q) to quit: " );
-                    final String input = sc.nextLine();
+                    final String input = sc.nextLine().trim();
 
                     if ( input.equalsIgnoreCase( "q" ) )
                         break shellMode;
@@ -177,13 +179,23 @@ public class WordBubbleSolver
                     }
                 }
 
-                // Insert configuration one row at a time
                 final Configuration config = new Configuration( cols, rows );
 
-                System.out.println( "\n Give board row by row now:" );
+                // Insert configuration one row at a time
+                while ( true )
+                {
+                    System.out.println( "\n Give board:" );
 
-                for ( int row = 0; row < rows; row++ )
-                    ConfigurationParser.parseRow( config, row, sc.nextLine() );
+                    try
+                    {
+                        ConfigurationParser.parse( config, sc.nextLine() );
+                    } catch ( final Exception e )
+                    {
+                        e.printStackTrace();
+                        continue;
+                    }
+                    break;
+                }
 
                 final WordBubbleSolver wbs = new WordBubbleSolver( config, dictionary );
 
@@ -192,6 +204,7 @@ public class WordBubbleSolver
 
                 Set<Set<String>> words;
                 int [] wordSizes = null;
+
 
                 while ( true )
                 {
@@ -216,7 +229,7 @@ public class WordBubbleSolver
                         words = wbs.solve( wordSizes );
                         final double t2 = ( System.currentTimeMillis() - t1 ) / 1000d;
                         System.out.printf( "%s%n%n %d answers in %.4f sec%n%n",
-                            words.toString().replaceAll( "],", "]\n" ), t2 );
+                            words.toString().replaceAll( "],", "]\n" ), words.size(), t2 );
 
                     } catch ( final NumberFormatException e )
                     {
@@ -238,8 +251,11 @@ public class WordBubbleSolver
                     System.out.printf( "  Current Pos Filter: %s%n", filterPos );
                     System.out.printf( "  Current Neg Filter: %s%n", filterNeg );
                     System.out.print(
-                        " Narrow down solution (word), (!word), remove filter (R WORD), (R !WORD) or (-) to continue: " );
-                    final String input = sc.nextLine().trim();
+                        " Narrow down solution (word), (!word),\n  remove filter (R WORD), (R !WORD)\n  or (-) to continue: " );
+                    final String input = sc.nextLine().toUpperCase().trim();
+
+                    if ( input.equals( "" ) )
+                        continue;
 
                     if ( input.equals( "-" ) )
                         break;
@@ -252,8 +268,7 @@ public class WordBubbleSolver
                         filterNeg.add( input.substring( 1 ) );
                     else filterPos.add( input );
 
-
-                    Set<Set<String>> narrowWords = new LinkedHashSet<Set<String>>();
+                    final Set<Set<String>> narrowWords = new LinkedHashSet<Set<String>>();
                     words.parallelStream().filter( sol -> sol.containsAll( filterPos ) )
                             .filter( sol ->
                     {
@@ -265,7 +280,7 @@ public class WordBubbleSolver
                                 return true;
                             } ).forEach( narrowWords::add );
 
-                    System.out.printf( "%s%n%n", narrowWords.toString().replaceAll( "],", "]\n" ) );
+                    System.out.printf( "%n%s%n%n", narrowWords.toString().replaceAll( "],", "]\n" ) );
                 }
             }
         } else
@@ -279,7 +294,8 @@ public class WordBubbleSolver
 
             final double t2 = ( System.currentTimeMillis() - t1 ) / 1000d;
 
-            System.out.printf( "%s%n%n %.4f sec%n", words, t2 );
+            System.out.printf( "%s%n%n %d answers in %.4f sec%n%n",
+                words.toString().replaceAll( "],", "]\n" ), words.size(), t2 );
         }
     }
 }

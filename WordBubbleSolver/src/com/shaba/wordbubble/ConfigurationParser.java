@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Alex Aiezza
@@ -56,5 +57,20 @@ public class ConfigurationParser
         int col = 0;
         while ( letterTokens.hasMoreTokens() )
             config.add( letterTokens.nextToken().toUpperCase().charAt( 0 ), rowIndex, col++ );
+    }
+
+    public static void parse( final Configuration config, final String strConfig )
+    {
+        final AtomicInteger col = new AtomicInteger(), row = new AtomicInteger();
+        strConfig.chars().map( Character::toUpperCase ).forEach( letter -> {
+            if ( col.get() >= config.getCols() )
+            {
+                col.set( 0 );
+                row.incrementAndGet();
+            }
+
+            config.add( (char) letter, row.get(), col.getAndIncrement() );
+        } );
+
     }
 }
