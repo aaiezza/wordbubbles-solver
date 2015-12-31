@@ -1,9 +1,10 @@
 package com.shaba.wordbubble;
 
-import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import com.shaba.wordbubble.utils.Coordinate;
 
 /**
  * @author Alex Aiezza
@@ -13,10 +14,9 @@ import java.util.List;
  */
 public class Configuration
 {
-    private final static int   DEFAULT_COLS = 3,
-                                       DEFAULT_ROWS = 3;
+    private final static int  DEFAULT_COLS = 3, DEFAULT_ROWS = 3;
 
-    private final Letter [] [] letters;
+    private final Letter [][] letters;
 
     public Configuration()
     {
@@ -50,9 +50,9 @@ public class Configuration
         return letters[row][col];
     }
 
-    public Letter getLetter( final Dimension dimension )
+    public Letter getLetter( final Coordinate dimension )
     {
-        return letters[dimension.height][dimension.width];
+        return letters[dimension.row][dimension.col];
     }
 
     public Configuration add( final Letter letter, final int row, final int col )
@@ -76,9 +76,8 @@ public class Configuration
 
     public Configuration add( final char letter, final int row, final int col )
     {
-        return add(
-            ( letter == Letter.BLANK_CHAR || letter == ' ' ) ? Letter.BLANK : new Letter( letter ),
-            row, col );
+        return add( ( letter == Letter.BLANK_CHAR || letter == ' ' ) ? Letter.BLANK : new Letter(
+                letter, row, col ), row, col );
     }
 
     public int numberOfLetters()
@@ -103,6 +102,7 @@ public class Configuration
         return letterList;
     }
 
+    @Override
     public String toString()
     {
         final StringBuilder out = new StringBuilder();

@@ -15,7 +15,7 @@
  */
 package com.shaba.wordbubble;
 
-import java.awt.Dimension;
+import com.shaba.wordbubble.utils.Coordinate;
 
 /**
  * @author Alex Aiezza
@@ -23,38 +23,31 @@ import java.awt.Dimension;
  */
 public enum Direction
 {
-    N( 0, -1 ),
-    NE( 1, -1 ),
-    E( 1, 0 ),
-    SE( 1, 1 ),
-    S( 0, 1 ),
-    SW( -1, 1 ),
-    W( -1, 0 ),
-    NW( -1, -1 );
+    N( 0, -1 ), NE( 1, -1 ), E( 1, 0 ), SE( 1, 1 ), S( 0, 1 ), SW( -1, 1 ), W( -1, 0 ), NW( -1, -1 );
 
     private static final String OUT_OF_BOUNDS_EXCEPTION_FORMAT = "Can't go %s from [%2d,%2d]";
 
     /* * * */
 
-    private final Dimension dim;
+    private final Coordinate    coordinate;
 
     private Direction( final int deltaX, final int deltaY )
     {
-        dim = new Dimension( deltaX, deltaY );
+        coordinate = new Coordinate( deltaX, deltaY );
     }
 
-    public Dimension alter( final int x, final int y, final int xMax, final int yMax )
+    public Coordinate alter( final int x, final int y, final int xMax, final int yMax )
     {
         if ( !canGo( x, y, xMax, yMax ) )
-            throw new ArrayIndexOutOfBoundsException(
-                    String.format( OUT_OF_BOUNDS_EXCEPTION_FORMAT, this.toString(), x, y ) );
+            throw new ArrayIndexOutOfBoundsException( String.format(
+                OUT_OF_BOUNDS_EXCEPTION_FORMAT, this.toString(), x, y ) );
 
-        return new Dimension( x + dim.width, y + dim.height );
+        return new Coordinate( x + coordinate.col, y + coordinate.row );
     }
 
     public boolean canGo( final int x, final int y, final int xMax, final int yMax )
     {
-        final int nX = x + dim.width, nY = y + dim.height;
+        final int nX = x + coordinate.col, nY = y + coordinate.row;
         return ( nX >= 0 && nX < xMax && nY >= 0 && nY < yMax );
     }
 }

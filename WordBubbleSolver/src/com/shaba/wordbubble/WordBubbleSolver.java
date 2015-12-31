@@ -84,11 +84,10 @@ public class WordBubbleSolver
 
     /* * * */
 
-    public Set<Set<String>> solve( final int... wordSizes )
+    public Set<Solution> solve( final int... wordSizes )
     {
         checkRequiredLetters( wordSizes );
-        final Set<Set<String>> solutions = Collections
-                .synchronizedSet( new LinkedHashSet<Set<String>>() );
+        final Set<Solution> solutions = Collections.synchronizedSet( new HashSet<Solution>() );
 
         Arrays.sort( wordSizes );
 
@@ -96,7 +95,7 @@ public class WordBubbleSolver
                 .getLetters()
                 .parallelStream()
                 .forEach(
-                    letter -> processLetter( letter, solutions, new LinkedHashSet<String>(),
+                    letter -> processLetter( letter, solutions, new Solution( configuration ),
                         new Stack<Letter>(), letter.getLetter(), wordSizes, wordSizes.length - 1 ) );
 
         return solutions;
@@ -104,8 +103,8 @@ public class WordBubbleSolver
 
     private void processLetter(
             final Letter letter,
-            final Set<Set<String>> solutions,
-            final Set<String> builtSolution,
+            final Set<Solution> solutions,
+            final Solution builtSolution,
             final Stack<Letter> seenLetters,
             final String builtWord,
             final int [] wordSizes,
@@ -119,8 +118,9 @@ public class WordBubbleSolver
         {
             if ( dictionary.search( builtWord ) )
             {
-                final Set<String> builtSolutionClone = new LinkedHashSet<String>( builtSolution );
-                builtSolutionClone.add( builtWord );
+                final Solution builtSolutionClone = builtSolution.clone();
+                builtSolutionClone.addWord( builtWord, seenLettersClone.subList(
+                    seenLettersClone.size() - wordSizes[wordSizeIndex], seenLettersClone.size() ) );
 
                 if ( wordSizeIndex - 1 >= 0 )
                 {
@@ -221,7 +221,7 @@ public class WordBubbleSolver
                 // ask for word sizes
                 System.out.printf( "%nConfiguration recieved:%n%s%n%n", config );
 
-                Set<Set<String>> words;
+                Set<Solution> words;
                 int [] wordSizes = null;
 
                 while ( true )
@@ -286,7 +286,7 @@ public class WordBubbleSolver
                         filterNeg.add( input.substring( 1 ) );
                     else filterPos.add( input );
 
-                    final Set<Set<String>> narrowWords = words.parallelStream()
+                    final Set<Solution> narrowWords = words.parallelStream()
                             .filter( sol -> sol.containsAll( filterPos ) ).filter( sol -> {
                                 for ( final String fn : filterNeg )
                                 {
@@ -297,7 +297,13 @@ public class WordBubbleSolver
                             } ).collect( Collectors.toCollection( LinkedHashSet::new ) );
 
                     System.out
-                            .printf( "%n%s%n%n", narrowWords.toString().replaceAll( "],", "]\n" ) );
+                            .printf( "%n%s%n%nNarrowed to %d solution from %d%n%n", narrowWords
+                                    .toString().replaceAll( "],", "]\n" ), narrowWords.size(),
+                                words.size() );
+
+                    if ( narrowWords.size() == 1 )
+                        narrowWords
+                                .forEach( sol -> System.out.printf( "%s%n%n", sol.printGuide() ) );
                 }
             }
         } else
@@ -315,9 +321,18 @@ public class WordBubbleSolver
             IntStream.range( 0, wordSizesList.size() ).forEachOrdered(
                 i -> wordSizes[i] = wordSizesList.get( i ) );
 
-            final Set<Set<String>> words = wbs.solve( wordSizes );
+            final Set<Solution> words = wbs.solve( wordSizes );
 
             final double t2 = ( System.currentTimeMillis() - t1 ) / 1000d;
+
+            System.out.println( wbs.configuration );
+
+            System.out.println();
+
+            if ( words.size() == 1 )
+                words.forEach( sol -> System.out.println( sol.printGuide() ) );
+
+            System.out.println();
 
             System.out.printf( "%s%n%n %d answers in %.4f sec%n%n",
                 words.toString().replaceAll( "],", "]\n" ), words.size(), t2 );

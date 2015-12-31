@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.shaba.wordbubble.utils.Coordinate;
+
 /**
  * @author Alex Aiezza
  *
@@ -14,29 +16,33 @@ public class Letter
 
     /* * * */
 
-    static final char BLANK_CHAR = '.';
+    static final char           BLANK_CHAR                    = '.';
 
-    public static final Letter BLANK = new Letter( BLANK_CHAR)
-    {
-        @Override
-        public Letter link( Letter letter )
-        {
-            return this;
-        }
-    };
+    public static final Letter  BLANK                         = new Letter( BLANK_CHAR, -1, -1 )
+                                                              {
+                                                                  @Override
+                                                                  public Letter link( Letter letter )
+                                                                  {
+                                                                      return this;
+                                                                  }
+                                                              };
 
-    private final char letter;
+    private final char          letter;
 
-    private final List<Letter> linkedLetters;
+    private final List<Letter>  linkedLetters;
 
-    public Letter( final char letter )
+    private final Coordinate    coordinate;
+
+    public Letter( final char letter, final int row, final int col )
     {
         if ( !Character.isLetter( letter ) && letter != BLANK_CHAR )
-            throw new IllegalArgumentException(
-                    String.format( NOT_A_LETTER_EXCEPTION_FORMAT, letter ) );
+            throw new IllegalArgumentException( String.format( NOT_A_LETTER_EXCEPTION_FORMAT,
+                letter ) );
 
         this.letter = Character.isLowerCase( letter ) ? Character.toUpperCase( letter ) : letter;
         linkedLetters = new ArrayList<Letter>( 3 );
+
+        coordinate = new Coordinate( row, col );
     }
 
     public char getLetterChar()
@@ -64,6 +70,11 @@ public class Letter
         return Collections.unmodifiableList( linkedLetters );
     }
 
+    public Coordinate getCoordinate()
+    {
+        return coordinate;
+    }
+
     public String print()
     {
         final StringBuilder out = new StringBuilder();
@@ -83,6 +94,7 @@ public class Letter
         return out.toString();
     }
 
+    @Override
     public String toString()
     {
         return letter + "";
