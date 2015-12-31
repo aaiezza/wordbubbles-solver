@@ -269620,6 +269620,8 @@ segues
 seguidilla
 seguidillas
 seguing
+segway
+segways
 sei
 seicento
 seicentos
