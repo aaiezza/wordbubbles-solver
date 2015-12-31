@@ -12,6 +12,8 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.shaba.wordbubble.utils.Dictionary;
 
@@ -31,15 +33,21 @@ public class WordBubbleSolver
     public static final Dictionary GET_DEFAULT_DICTIONARY()
     {
         final Dictionary dictionary = new Dictionary();
-
         for ( final String dic : DEFAULT_DICTIONARIES )
         {
-            try ( final Scanner sc = new Scanner( new File( dic ) ) )
+            try ( final Scanner sc = new Scanner(
+                    WordBubbleSolver.class.getResourceAsStream( "/" + dic ) ) )
             {
                 sc.forEachRemaining( word -> dictionary.insert( word.toUpperCase() ) );
-            } catch ( final FileNotFoundException e )
+            } catch ( final NullPointerException e )
             {
-                e.printStackTrace();
+                try ( final Scanner sc = new Scanner( new File( dic ) ) )
+                {
+                    sc.forEachRemaining( word -> dictionary.insert( word.toUpperCase() ) );
+                } catch ( final FileNotFoundException e1 )
+                {
+                    System.err.println( String.format( "Dictionary '%s' not available.", dic ) );
+                }
             }
         }
 
@@ -268,9 +276,8 @@ public class WordBubbleSolver
                         filterNeg.add( input.substring( 1 ) );
                     else filterPos.add( input );
 
-                    final Set<Set<String>> narrowWords = new LinkedHashSet<Set<String>>();
-                    words.parallelStream().filter( sol -> sol.containsAll( filterPos ) )
-                            .filter( sol ->
+                    final Set<Set<String>> narrowWords = words.parallelStream()
+                            .filter( sol -> sol.containsAll( filterPos ) ).filter( sol ->
                     {
                                 for ( final String fn : filterNeg )
                                 {
@@ -278,9 +285,10 @@ public class WordBubbleSolver
                                         return false;
                                 }
                                 return true;
-                            } ).forEach( narrowWords::add );
+                            } ).collect( Collectors.toCollection( LinkedHashSet::new ) );
 
-                    System.out.printf( "%n%s%n%n", narrowWords.toString().replaceAll( "],", "]\n" ) );
+                    System.out.printf( "%n%s%n%n",
+                        narrowWords.toString().replaceAll( "],", "]\n" ) );
                 }
             }
         } else
@@ -290,7 +298,15 @@ public class WordBubbleSolver
             final WordBubbleSolver wbs = new WordBubbleSolver(
                     new ConfigurationParser().parse( args[0] ) );
 
-            final Set<Set<String>> words = wbs.solve( Integer.parseInt( args[1] ) );
+            final List<Integer> wordSizesList = Arrays
+                    .asList( Arrays.copyOfRange( args, 1, args.length ) ).stream()
+                    .map( Integer::parseInt ).collect( Collectors.toList() );
+
+            final int [] wordSizes = new int [wordSizesList.size()];
+            IntStream.range( 0, wordSizesList.size() )
+                    .forEachOrdered( i -> wordSizes[i] = wordSizesList.get( i ) );
+
+            final Set<Set<String>> words = wbs.solve( wordSizes );
 
             final double t2 = ( System.currentTimeMillis() - t1 ) / 1000d;
 
