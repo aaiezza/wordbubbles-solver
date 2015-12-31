@@ -47901,6 +47901,8 @@ celloist
 cellophane
 cellos
 cellose
+cellphone
+cellphones
 cells
 cellular
 cellularity
