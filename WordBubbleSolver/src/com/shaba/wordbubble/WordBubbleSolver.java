@@ -28,15 +28,15 @@ public class WordBubbleSolver
     private static final String [] DEFAULT_DICTIONARIES      = { "resources/dictionary.txt"/*
                                                                                             * ,
                                                                                             * "resources/google-dictionary.txt"
-                                                                                            */ };
+                                                                                            */};
 
     public static final Dictionary GET_DEFAULT_DICTIONARY()
     {
         final Dictionary dictionary = new Dictionary();
         for ( final String dic : DEFAULT_DICTIONARIES )
         {
-            try ( final Scanner sc = new Scanner(
-                    WordBubbleSolver.class.getResourceAsStream( "/" + dic ) ) )
+            try ( final Scanner sc = new Scanner( WordBubbleSolver.class.getResourceAsStream( "/" +
+                    dic ) ) )
             {
                 sc.forEachRemaining( word -> dictionary.insert( word.toUpperCase() ) );
             } catch ( final NullPointerException e )
@@ -90,9 +90,14 @@ public class WordBubbleSolver
         final Set<Set<String>> solutions = Collections
                 .synchronizedSet( new LinkedHashSet<Set<String>>() );
 
-        configuration.getLetters().parallelStream()
-                .forEach( letter -> processLetter( letter, solutions, new LinkedHashSet<String>(),
-                    new Stack<Letter>(), letter.getLetter(), wordSizes, 0 ) );
+        Arrays.sort( wordSizes );
+
+        configuration
+                .getLetters()
+                .parallelStream()
+                .forEach(
+                    letter -> processLetter( letter, solutions, new LinkedHashSet<String>(),
+                        new Stack<Letter>(), letter.getLetter(), wordSizes, wordSizes.length - 1 ) );
 
         return solutions;
     }
@@ -117,13 +122,16 @@ public class WordBubbleSolver
                 final Set<String> builtSolutionClone = new LinkedHashSet<String>( builtSolution );
                 builtSolutionClone.add( builtWord );
 
-                if ( wordSizeIndex + 1 < wordSizes.length )
+                if ( wordSizeIndex - 1 >= 0 )
                 {
-                    configuration.getLetters().stream()
+                    configuration
+                            .getLetters()
+                            .stream()
                             .filter( let -> !seenLettersClone.contains( let ) )
-                            .forEach( dubLetter -> processLetter( dubLetter, solutions,
-                                builtSolutionClone, seenLettersClone, dubLetter.getLetter(),
-                                wordSizes, wordSizeIndex + 1 ) );
+                            .forEach(
+                                dubLetter -> processLetter( dubLetter, solutions,
+                                    builtSolutionClone, seenLettersClone, dubLetter.getLetter(),
+                                    wordSizes, wordSizeIndex - 1 ) );
                 } else if ( builtSolutionClone.size() == wordSizes.length )
                 {
                     solutions.add( builtSolutionClone );
@@ -133,10 +141,13 @@ public class WordBubbleSolver
             return;
         }
 
-        letter.getLinkedLetters().stream().filter( let -> !seenLettersClone.contains( let ) )
-                .forEach( subLetter -> processLetter( subLetter, solutions, builtSolution,
-                    seenLettersClone, builtWord + subLetter.getLetter(), wordSizes,
-                    wordSizeIndex ) );
+        letter.getLinkedLetters()
+                .stream()
+                .filter( let -> !seenLettersClone.contains( let ) )
+                .forEach(
+                    subLetter -> processLetter( subLetter, solutions, builtSolution,
+                        seenLettersClone, builtWord + subLetter.getLetter(), wordSizes,
+                        wordSizeIndex ) );
     }
 
     private void checkRequiredLetters( final int... wordSizes )
@@ -154,7 +165,7 @@ public class WordBubbleSolver
     public static void main( final String [] args ) throws FileNotFoundException
     {
         // Go into Shell Mode
-        if ( args.length <= 0 /* arg.equals( "-s" ) */ )
+        if ( args.length <= 0 /* arg.equals( "-s" ) */)
         {
             final Dictionary dictionary = GET_DEFAULT_DICTIONARY();
             @SuppressWarnings ( "resource" )
@@ -208,11 +219,10 @@ public class WordBubbleSolver
                 final WordBubbleSolver wbs = new WordBubbleSolver( config, dictionary );
 
                 // ask for word sizes
-                System.out.printf( "%n Configuration recieved:%n%s%n%n", config );
+                System.out.printf( "%nConfiguration recieved:%n%s%n%n", config );
 
                 Set<Set<String>> words;
                 int [] wordSizes = null;
-
 
                 while ( true )
                 {
@@ -236,8 +246,8 @@ public class WordBubbleSolver
                         final long t1 = System.currentTimeMillis();
                         words = wbs.solve( wordSizes );
                         final double t2 = ( System.currentTimeMillis() - t1 ) / 1000d;
-                        System.out.printf( "%s%n%n %d answers in %.4f sec%n%n",
-                            words.toString().replaceAll( "],", "]\n" ), words.size(), t2 );
+                        System.out.printf( "%s%n%n %d answers in %.4f sec%n%n", words.toString()
+                                .replaceAll( "],", "]\n" ), words.size(), t2 );
 
                     } catch ( final NumberFormatException e )
                     {
@@ -258,8 +268,8 @@ public class WordBubbleSolver
                 {
                     System.out.printf( "  Current Pos Filter: %s%n", filterPos );
                     System.out.printf( "  Current Neg Filter: %s%n", filterNeg );
-                    System.out.print(
-                        " Narrow down solution (word), (!word),\n  remove filter (R WORD), (R !WORD)\n  or (-) to continue: " );
+                    System.out
+                            .print( " Narrow down solution (word), (!word),\n  remove filter (R WORD), (R !WORD)\n  or (-) to continue: " );
                     final String input = sc.nextLine().toUpperCase().trim();
 
                     if ( input.equals( "" ) )
@@ -277,8 +287,7 @@ public class WordBubbleSolver
                     else filterPos.add( input );
 
                     final Set<Set<String>> narrowWords = words.parallelStream()
-                            .filter( sol -> sol.containsAll( filterPos ) ).filter( sol ->
-                    {
+                            .filter( sol -> sol.containsAll( filterPos ) ).filter( sol -> {
                                 for ( final String fn : filterNeg )
                                 {
                                     if ( sol.contains( fn ) )
@@ -287,8 +296,8 @@ public class WordBubbleSolver
                                 return true;
                             } ).collect( Collectors.toCollection( LinkedHashSet::new ) );
 
-                    System.out.printf( "%n%s%n%n",
-                        narrowWords.toString().replaceAll( "],", "]\n" ) );
+                    System.out
+                            .printf( "%n%s%n%n", narrowWords.toString().replaceAll( "],", "]\n" ) );
                 }
             }
         } else
@@ -303,8 +312,8 @@ public class WordBubbleSolver
                     .map( Integer::parseInt ).collect( Collectors.toList() );
 
             final int [] wordSizes = new int [wordSizesList.size()];
-            IntStream.range( 0, wordSizesList.size() )
-                    .forEachOrdered( i -> wordSizes[i] = wordSizesList.get( i ) );
+            IntStream.range( 0, wordSizesList.size() ).forEachOrdered(
+                i -> wordSizes[i] = wordSizesList.get( i ) );
 
             final Set<Set<String>> words = wbs.solve( wordSizes );
 
