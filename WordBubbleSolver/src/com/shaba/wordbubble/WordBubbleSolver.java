@@ -221,7 +221,7 @@ public class WordBubbleSolver
                 // ask for word sizes
                 System.out.printf( "%nConfiguration recieved:%n%s%n%n", config );
 
-                Set<Solution> words;
+                Set<Solution> solutions;
                 int [] wordSizes = null;
 
                 while ( true )
@@ -244,10 +244,13 @@ public class WordBubbleSolver
 
                         // give answer
                         final long t1 = System.currentTimeMillis();
-                        words = wbs.solve( wordSizes );
+                        solutions = wbs.solve( wordSizes );
                         final double t2 = ( System.currentTimeMillis() - t1 ) / 1000d;
-                        System.out.printf( "%s%n%n %d answers in %.4f sec%n%n", words.toString()
-                                .replaceAll( "],", "]\n" ), words.size(), t2 );
+                        System.out.printf( "%s%n%n %d answers in %.4f sec%n%n", solutions.toString()
+                                .replaceAll( "],", "]\n" ), solutions.size(), t2 );
+
+                        if ( solutions.size() == 1 )
+                            solutions.forEach( sol -> System.out.printf( "%s%n%n", sol.printGuide() ) );
 
                     } catch ( final NumberFormatException e )
                     {
@@ -286,7 +289,7 @@ public class WordBubbleSolver
                         filterNeg.add( input.substring( 1 ) );
                     else filterPos.add( input );
 
-                    final Set<Solution> narrowWords = words.parallelStream()
+                    final Set<Solution> narrowSolutions = solutions.parallelStream()
                             .filter( sol -> sol.containsAll( filterPos ) ).filter( sol -> {
                                 for ( final String fn : filterNeg )
                                 {
@@ -297,12 +300,12 @@ public class WordBubbleSolver
                             } ).collect( Collectors.toCollection( LinkedHashSet::new ) );
 
                     System.out
-                            .printf( "%n%s%n%nNarrowed to %d solution from %d%n%n", narrowWords
-                                    .toString().replaceAll( "],", "]\n" ), narrowWords.size(),
-                                words.size() );
+                            .printf( "%n%s%n%nNarrowed to %d solution from %d%n%n", narrowSolutions
+                                    .toString().replaceAll( "],", "]\n" ), narrowSolutions.size(),
+                                solutions.size() );
 
-                    if ( narrowWords.size() == 1 )
-                        narrowWords
+                    if ( narrowSolutions.size() == 1 )
+                        narrowSolutions
                                 .forEach( sol -> System.out.printf( "%s%n%n", sol.printGuide() ) );
                 }
             }
