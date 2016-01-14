@@ -282804,7 +282804,9 @@ spacewalks
 spaceward
 spacewoman
 spacewomen
+spacey
 spacial
+spacials
 spaciality
 spacially
 spaciness
