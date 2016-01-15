@@ -9,11 +9,22 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'git'
+apply plugin: 'github'
 apply plugin: 'release'
+apply plugin: 'console'
 
 
 group = 'shaba'
 jar.baseName = 'WordBubblesSolver'
+
+github {
+    repo = 'git@github.com:aaiezza/word-bubble-solver.git'
+    credentials {
+        username = { console.prompt ('Please enter Github username:') }
+        password = { console.prompt ('Please enter Github password:') }
+    }
+}
 
 
 // Redefine the sourcesets
@@ -41,10 +52,17 @@ release {
             throw new GradleException('You have uncommitted changes.')
         }
     }
-
+    
+    def bumpVersion = { version ->
+		def vers = version.split("\\.")
+		def newVers = (vers[vers.length-1] as Integer) + 1
+		
+		version.substring(0, version.lastIndexOf(".") + 1) + newVers
+	}
+    
     /* Ask user for a release version, suggesting some default variant. */
     version = { console.prompt(' > Please enter release version:', project.version - '-SNAPSHOT') }
-    tag = { "r$project.release.version" }
+    tag = { "v$project.release.version" }
     commitMessage = { "Release $project.release.version" }
 
     /* Files and projects that needs to be updated with a new release version. */
@@ -55,8 +73,14 @@ release {
 
     /* Spec for next version. As above, asking user input. */
     next {
-        version = { console.prompt(' > Please enter next version:', bumpVersion(project.release.version)) }
+        version = { console.prompt(' > Please enter next version:', bumpVersion( project.release.version ) ) }
         commitMessage = { "Bumping version to $project.release.next.version" }
+    }
+
+    /* Files and projects that needs to be updated with a new release version. */
+    update {
+        file project.file('build.gradle')
+        projects allprojects
     }
 
     /* Tasks that needs to be performed during release. Will be done after tag step. */
