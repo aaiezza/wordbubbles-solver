@@ -1,0 +1,64 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'me.trnl:github-release-gradle-plugin:0.1'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'release'
+
+
+group = 'shaba'
+jar.baseName = 'WordBubblesSolver'
+
+
+// Redefine the sourcesets
+sourceSets {
+    main {
+        java.srcDir 'src'
+        resources {
+            srcDir 'resources'
+            exclude 'test.wb'
+            // include '*Usage.txt'
+        }
+        output.resourcesDir "${output.resourcesDir}/resources"
+        output.classesDir 'bin'
+    }
+    test {
+        java.srcDir 'test'
+        resources.srcDirs 'test_resources', main.resources
+    }
+}
+
+release {
+    /* Let's check that everything is committed */
+    doFirst {
+        if (!project.git.status().isEmpty()) {
+            throw new GradleException('You have uncommitted changes.')
+        }
+    }
+
+    /* Ask user for a release version, suggesting some default variant. */
+    version = { console.prompt(' > Please enter release version:', project.version - '-SNAPSHOT') }
+    tag = { "r$project.release.version" }
+    commitMessage = { "Release $project.release.version" }
+
+    /* Files and projects that needs to be updated with a new release version. */
+    update {
+        file project.file('build.gradle')
+        projects allprojects
+    }
+
+    /* Spec for next version. As above, asking user input. */
+    next {
+        version = { console.prompt(' > Please enter next version:', bumpVersion(project.release.version)) }
+        commitMessage = { "Bumping version to $project.release.next.version" }
+    }
+
+    /* Tasks that needs to be performed during release. Will be done after tag step. */
+    dependsOn jar
+}
