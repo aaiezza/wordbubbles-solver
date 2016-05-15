@@ -23,7 +23,7 @@ public class Solution implements Cloneable
 
         guide = new ArrayList<List<String>>( configuration.getRows() );
 
-        IntStream.range( 0, configuration.getCols() ).forEach( i -> {
+        IntStream.range( 0, configuration.getRows() ).forEach( i -> {
             final List<String> row = new ArrayList<String>( configuration.getCols() );
             IntStream.range( 0, configuration.getCols() ).forEach( j -> row.add( "" ) );
             guide.add( row );
