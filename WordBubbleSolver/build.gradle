@@ -1,3 +1,14 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'git'
+apply plugin: 'github'
+apply plugin: 'release'
+apply plugin: 'console'
+
+repositories {
+    mavenCentral()
+}
+
 buildscript {
     repositories {
         mavenCentral()
@@ -7,13 +18,9 @@ buildscript {
     }
 }
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'git'
-apply plugin: 'github'
-apply plugin: 'release'
-apply plugin: 'console'
-
+dependencies {
+	testCompile 'junit:junit:4.+'
+}
 
 group = 'shaba'
 jar {
