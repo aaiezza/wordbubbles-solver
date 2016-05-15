@@ -46,6 +46,7 @@ sourceSets {
         resources {
             srcDir 'resources'
             exclude 'test.wb'
+            exclude 'bin'
             // include '*Usage.txt'
         }
         output.classesDir 'bin'
