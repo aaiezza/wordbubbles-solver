@@ -9,7 +9,31 @@ buildscript {
 
 plugins {
     id 'java'
+    id 'maven-publish'
 }
+sourceCompatibility = 11
+targetCompatibility = 11
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.shaba'
+            artifactId = 'wordbubbles-solver'
+            version = '1.3.0'
+
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            name = 'sampleRepo'
+            url = layout.buildDirectory.dir("repo")
+        }
+    }
+}
+
+
 
 repositories {
     mavenCentral()
@@ -36,12 +60,10 @@ sourceSets {
 
 group = 'shaba'
 jar {
-    baseName = 'WordBubblesSolver'
+    archiveBaseName = 'WordBubblesSolver'
     manifest.attributes 'Main-Class': 'com.shaba.wordbubble.WordBubbleSolver'
     destinationDir project.rootDir
 }
 
-processResources { rename { "resources/${it}" } }
-
 // Add deleting the jar file to the clean task
-clean { delete jar.archivePath }
+clean { delete jar.archiveFile }
