@@ -75668,6 +75668,7 @@ defunctionalization
 defunctionalize
 defunctive
 defunctness
+defund
 defuse
 defused
 defuses
