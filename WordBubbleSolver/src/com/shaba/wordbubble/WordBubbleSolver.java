@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.shaba.wordbubble.utils.Dictionary;
-import com.sun.media.sound.InvalidFormatException;
 
 /**
  * @author Alex Aiezza
@@ -169,8 +168,7 @@ public class WordBubbleSolver
 
     /* * * */
 
-    public static void main( final String [] args ) throws FileNotFoundException,
-            InvalidFormatException
+    public static void main( final String [] args ) throws FileNotFoundException
     {
         // Go into Shell Mode
         if ( args.length <= 0 /* arg.equals( "-s" ) */)

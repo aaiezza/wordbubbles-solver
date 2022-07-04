@@ -8,8 +8,6 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.sun.media.sound.InvalidFormatException;
-
 /**
  * @author Alex Aiezza
  *
@@ -18,20 +16,18 @@ public class ConfigurationParser
 {
     public FileConfigurationType DEFAULT_FILE_CONGIFURATION_TYPE = FileConfigurationType.FLAT;
 
-    public Configuration parse( final String file ) throws FileNotFoundException,
-            InvalidFormatException
+    public Configuration parse( final String file ) throws FileNotFoundException
     {
         return parse( file, DEFAULT_FILE_CONGIFURATION_TYPE );
     }
 
     public Configuration parse( final String file, final FileConfigurationType type )
-            throws FileNotFoundException, InvalidFormatException
+            throws FileNotFoundException
     {
         return parse( new File( file ), type );
     }
 
-    public Configuration parse( final File file ) throws FileNotFoundException,
-            InvalidFormatException
+    public Configuration parse( final File file ) throws FileNotFoundException
     {
         return parse( file, DEFAULT_FILE_CONGIFURATION_TYPE );
     }
@@ -40,11 +36,10 @@ public class ConfigurationParser
      * 
      * @param file
      * @throws FileNotFoundException
-     * @throws InvalidFormatException
      * @throws Exception
      */
     public Configuration parse( final File file, final FileConfigurationType type )
-            throws FileNotFoundException, InvalidFormatException
+            throws FileNotFoundException
     {
         if ( type == FileConfigurationType.TABLE )
         {
@@ -90,7 +85,7 @@ public class ConfigurationParser
                     return config;
                 } catch ( final NumberFormatException | ArrayIndexOutOfBoundsException e )
                 {
-                    throw new InvalidFormatException(
+                    throw new IllegalArgumentException(
                             "Flat file no good. Need to start with number of cols and rows!" );
                 }
             }
