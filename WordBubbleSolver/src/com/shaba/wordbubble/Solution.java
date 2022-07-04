@@ -40,6 +40,11 @@ public class Solution implements Cloneable
         this.guide = guide;
     }
 
+    public Set<String> getSolution()
+    {
+        return solution;
+    }
+
     public boolean addWord( final String word, final List<Letter> letters )
     {
         if ( !solution.add( word ) )
