@@ -43,27 +43,14 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 }
 
-// Redefine the sourcesets
-sourceSets {
-    main {
-        java.srcDir 'src'
-        resources {
-            srcDir 'resources'
-        }
-    }
-    test {
-        java.srcDir 'test'
-        resources.srcDirs 'test_resources', main.resources
-    }
-}
-
-
 group = 'shaba'
 jar {
     archiveBaseName = 'WordBubblesSolver'
     manifest.attributes 'Main-Class': 'com.shaba.wordbubble.WordBubbleSolver'
     destinationDir project.rootDir
 }
+
+processResources { rename { "resources/${it}" } }
 
 // Add deleting the jar file to the clean task
 clean { delete jar.archiveFile }
