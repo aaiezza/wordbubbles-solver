@@ -1,4 +1,4 @@
-package com.shaba.wordbubble.utils;
+package com.shaba.wordbubbles.utils;
 
 import java.util.HashMap;
 import java.util.HashSet;

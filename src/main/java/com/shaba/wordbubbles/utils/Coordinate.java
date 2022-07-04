@@ -1,4 +1,4 @@
-package com.shaba.wordbubble.utils;
+package com.shaba.wordbubbles.utils;
 
 public class Coordinate
 {

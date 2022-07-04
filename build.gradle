@@ -45,8 +45,7 @@ dependencies {
 
 group = 'shaba'
 jar {
-    archiveBaseName = 'WordBubblesSolver'
-    manifest.attributes 'Main-Class': 'com.shaba.wordbubble.WordBubbleSolver'
+    manifest.attributes 'Main-Class': 'com.shaba.wordbubbles.WordBubbleSolver'
     destinationDir project.rootDir
 }
 

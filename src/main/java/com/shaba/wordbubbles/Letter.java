@@ -1,10 +1,10 @@
-package com.shaba.wordbubble;
+package com.shaba.wordbubbles;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.shaba.wordbubble.utils.Coordinate;
+import com.shaba.wordbubbles.utils.Coordinate;
 
 /**
  * @author Alex Aiezza

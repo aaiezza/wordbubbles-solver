@@ -1,4 +1,4 @@
-package com.shaba.wordbubble;
+package com.shaba.wordbubbles;
 
 import java.io.FileNotFoundException;
 import java.util.Set;

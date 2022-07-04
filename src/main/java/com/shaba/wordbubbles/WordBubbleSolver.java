@@ -1,4 +1,4 @@
-package com.shaba.wordbubble;
+package com.shaba.wordbubbles;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import com.shaba.wordbubble.utils.Dictionary;
+import com.shaba.wordbubbles.utils.Dictionary;
 
 /**
  * @author Alex Aiezza
